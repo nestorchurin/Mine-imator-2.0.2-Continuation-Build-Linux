@@ -6,6 +6,9 @@ set(WINDOWS_32BIT 0)
 # Build with release optimizations (Mac/Linux)
 set(MAC_LINUX_RELEASE 1)
 
+# Use system libraries instead of bundled static archives (recommended for Flatpak)
+option(USE_SYSTEM_LIBS "Use system-provided media, archive and audio libraries" OFF)
+
 # Project setup
 set(CMAKE_CXX_STANDARD 17)
 set(QT_VERSION "5.15.9")
@@ -21,8 +24,18 @@ if (WIN32)
 	endif()
 	set(CMAKE_GENERATOR_PLATFORM ${PLATFORM})
 elseif (NOT APPLE)
-	set(CMAKE_C_COMPILER "/usr/bin/clang-12")
-	set(CMAKE_CXX_COMPILER "/usr/bin/clang++-12")
+	if (EXISTS "/usr/bin/clang-12" AND EXISTS "/usr/bin/clang++-12")
+		set(CMAKE_C_COMPILER "/usr/bin/clang-12")
+		set(CMAKE_CXX_COMPILER "/usr/bin/clang++-12")
+	elseif (NOT CMAKE_C_COMPILER AND NOT CMAKE_CXX_COMPILER)
+		# Fallback for newer Linux environments where clang-12 is unavailable.
+		find_program(CLANG_BIN clang)
+		find_program(CLANGXX_BIN clang++)
+		if (CLANG_BIN AND CLANGXX_BIN)
+			set(CMAKE_C_COMPILER "${CLANG_BIN}")
+			set(CMAKE_CXX_COMPILER "${CLANGXX_BIN}")
+		endif()
+	endif()
 endif()
 
 project(Mine-imator)
@@ -55,7 +68,11 @@ if (WIN32)
 
 else()
 
-	set(DEV_DIR "~/Dev")
+	if (DEFINED ENV{DEV_DIR})
+		set(DEV_DIR $ENV{DEV_DIR})
+	else()
+		set(DEV_DIR "$ENV{HOME}/Dev")
+	endif()
 	add_definitions("-DOS_UNIX")
 	add_compile_options("-Wall")
 	add_compile_options("-Wno-overloaded-virtual")
@@ -96,13 +113,35 @@ else()
 
 		message("Linux platform")
 		set(EXT_DIR "${CMAKE_SOURCE_DIR}/External/Linux")
-		set(LIBS ${LIBS} "-lvdpau -lva -lva-drm -lva-x11 -lsndio -lx264 -lgnutls -lnettle")
+		if (NOT USE_SYSTEM_LIBS)
+			set(LIBS ${LIBS} "-lvdpau -lva -lva-drm -lva-x11 -lsndio -lx264 -lgnutls -lnettle")
+		else()
+			find_package(PkgConfig REQUIRED)
+			pkg_check_modules(PC_OPENAL REQUIRED IMPORTED_TARGET openal)
+			pkg_check_modules(PC_LIBZIP REQUIRED IMPORTED_TARGET libzip)
+			pkg_check_modules(PC_AVFORMAT REQUIRED IMPORTED_TARGET libavformat)
+			pkg_check_modules(PC_AVCODEC REQUIRED IMPORTED_TARGET libavcodec)
+			pkg_check_modules(PC_AVUTIL REQUIRED IMPORTED_TARGET libavutil)
+			pkg_check_modules(PC_SWRESAMPLE REQUIRED IMPORTED_TARGET libswresample)
+			pkg_check_modules(PC_SWSCALE REQUIRED IMPORTED_TARGET libswscale)
+			set(LIBS ${LIBS}
+				PkgConfig::PC_OPENAL
+				PkgConfig::PC_LIBZIP
+				PkgConfig::PC_AVFORMAT
+				PkgConfig::PC_AVCODEC
+				PkgConfig::PC_AVUTIL
+				PkgConfig::PC_SWRESAMPLE
+				PkgConfig::PC_SWSCALE
+			)
+		endif()
 		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath='$ORIGIN'/Data") # Find .so in Data folder
 
 	endif()
 
-	set(LIBS ${LIBS} "${EXT_DIR}/libz.a" "${EXT_DIR}/libzip.a" "${EXT_DIR}/libopenal.a") # Zip, OpenAL (precompiled)
-	set(LIBS ${LIBS} "bz2" "lzma") # Zip dependencies
+	if (NOT USE_SYSTEM_LIBS)
+		set(LIBS ${LIBS} "${EXT_DIR}/libz.a" "${EXT_DIR}/libzip.a" "${EXT_DIR}/libopenal.a") # Zip, OpenAL (precompiled)
+		set(LIBS ${LIBS} "bz2" "lzma") # Zip dependencies
+	endif()
 	
 	# Add OpenMP
 	find_package(OpenMP REQUIRED)
@@ -115,8 +154,12 @@ message("EXT_DIR = ${EXT_DIR}")
 
 # Add Qt
 set(Qt_DIR "${DEV_DIR}/Qt/${QT_VERSION}/build")
-message("Qt_DIR = ${Qt_DIR}")
-set(CMAKE_PREFIX_PATH ${Qt_DIR})
+if (EXISTS "${Qt_DIR}")
+	message("Qt_DIR = ${Qt_DIR}")
+	list(APPEND CMAKE_PREFIX_PATH "${Qt_DIR}")
+else()
+	message("Qt_DIR = system")
+endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC OFF)
@@ -147,17 +190,21 @@ add_definitions(-DASSETS_DIR="${CMAKE_SOURCE_DIR}/Asset")
 set(INCLUDE_DIRS ${CMAKE_SOURCE_DIR})
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS})
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/External")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/Libzip/libzip-1.9.2/lib")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/FreeType/freetype-2.9.1/include")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/FFmpeg/ffmpeg-5.0")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/OpenAL/openal-soft-1.22.0/include")
+if (NOT USE_SYSTEM_LIBS)
+	set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/Libzip/libzip-1.9.2/lib")
+	set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/FreeType/freetype-2.9.1/include")
+	set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/FFmpeg/ffmpeg-5.0")
+	set(INCLUDE_DIRS ${INCLUDE_DIRS} "${DEV_DIR}/OpenAL/openal-soft-1.22.0/include")
+endif()
 
 # Add FFmpeg (precompiled)
-set(LIBS ${LIBS} "${EXT_DIR}/libavformat.a")
-set(LIBS ${LIBS} "${EXT_DIR}/libavcodec.a")
-set(LIBS ${LIBS} "${EXT_DIR}/libswresample.a")
-set(LIBS ${LIBS} "${EXT_DIR}/libswscale.a")
-set(LIBS ${LIBS} "${EXT_DIR}/libavutil.a")
+if (NOT USE_SYSTEM_LIBS)
+	set(LIBS ${LIBS} "${EXT_DIR}/libavformat.a")
+	set(LIBS ${LIBS} "${EXT_DIR}/libavcodec.a")
+	set(LIBS ${LIBS} "${EXT_DIR}/libswresample.a")
+	set(LIBS ${LIBS} "${EXT_DIR}/libswscale.a")
+	set(LIBS ${LIBS} "${EXT_DIR}/libavutil.a")
+endif()
 
 # Add C++ sources
 file(GLOB_RECURSE SRCS RELATIVE "${CMAKE_SOURCE_DIR}" "*.cpp" "*.hpp")

@@ -12,3 +12,51 @@ Mine-imator is a 3D movie maker based on the sandbox game Minecraft, with over 8
 Website and download: https://www.mineimator.com
 
 The software is written using GameMaker Language and converted to a separate C++ environment using a custom built GML parser (CppGen). The final executable is built for Windows, Mac OS and Linux using the Qt framework, DirectX/OpenGL rendering and various other libraries.
+
+## Linux fork note
+
+This repository is a community-maintained Linux fork/packaging effort for Mine-imator.
+
+- Upstream official website: https://www.mineimator.com
+- Linux fork maintainer: Nestor Churin
+- Maintainer page: https://nestor-churin.com
+
+## Flatpak build (Linux)
+
+This repository now includes a Flatpak manifest for Linux packaging:
+
+- `flatpak/io.github.nestorchurin.MineImator.yml`
+
+### Prerequisites
+
+Install required tools:
+
+```bash
+sudo apt install flatpak flatpak-builder
+```
+
+Ensure Flathub remote exists:
+
+```bash
+flatpak remotes --show-details
+```
+
+### Build and install (user scope)
+
+```bash
+flatpak-builder --user --install --force-clean build-flatpak flatpak/io.github.nestorchurin.MineImator.yml
+```
+
+### Run
+
+```bash
+flatpak run io.github.nestorchurin.MineImator
+```
+
+### Build a distributable bundle
+
+```bash
+flatpak build-bundle ~/.local/share/flatpak/repo MineImator.flatpak io.github.nestorchurin.MineImator
+```
+
+For Flathub submission steps, see `FLATHUB_SUBMISSION.md`.

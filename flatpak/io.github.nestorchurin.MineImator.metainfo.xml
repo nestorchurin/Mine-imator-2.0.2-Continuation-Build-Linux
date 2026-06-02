@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 Nestor Churin -->
+<component type="desktop-application">
+  <id>io.github.nestorchurin.MineImator</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Mine-imator</name>
+  <summary>Community Linux fork of Mine-imator</summary>
+  <description>
+    <p>
+      **This is a community Linux fork of Mine-imator and is not officially supported by the original upstream team.**
+    </p>
+    <p>
+      Mine-imator is a 3D movie maker for creating Minecraft-style animations.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.nestorchurin.MineImator.desktop</launchable>
+  <url type="homepage">https://www.mineimator.com</url>
+  <url type="contact">https://nestor-churin.com</url>
+  <url type="bugtracker">https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build/issues</url>
+  <url type="vcs-browser">https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build</url>
+  <developer id="io.github.nestorchurin">
+    <name>Nestor Churin</name>
+  </developer>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://www.mineimatorforums.com/uploads/monthly_2023_03/336815532_programview.png.9212aa1f6d1bed63411408aa5e905ce0.png</image>
+      <caption>Main editing interface</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://www.mineimatorforums.com/uploads/monthly_2021_08/image.png.4699187f1f02be8222a5bf5100c1738f.png</image>
+      <caption>Render and scene workflow</caption>
+    </screenshot>
+  </screenshots>
+  <provides>
+    <binary>mine-imator</binary>
+  </provides>
+  <releases>
+    <release version="1.0.13" date="2026-03-24"/>
+  </releases>
+  <requires>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <display_length compare="ge">768</display_length>
+  </requires>
+  <content_rating type="oars-1.1"/>
+</component>

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Mine-imator
+Comment=Minecraft 3D animation software
+Exec=mine-imator
+Icon=io.github.nestorchurin.MineImator
+Terminal=false
+Categories=Graphics;3DGraphics;AudioVideo;
+StartupWMClass=mine-imator
