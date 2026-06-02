@@ -28,4 +28,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build.git
-        commit: 62bdaaf3c86af343ab827ed16c080a82e2782f91
+        commit: 41cb3acaec0f8ca56b72ff1215a306f3dead4c22
