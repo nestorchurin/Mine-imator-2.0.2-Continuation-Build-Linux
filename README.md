@@ -25,7 +25,7 @@ This repository is a community-maintained Linux fork/packaging effort for Mine-i
 
 This repository now includes a Flatpak manifest for Linux packaging:
 
-- `flatpak/io.github.nestorchurin.MineImator.yml`
+- `flatpak/com.nestor_churin.MineImator.yml`
 
 ### Prerequisites
 
@@ -44,19 +44,19 @@ flatpak remotes --show-details
 ### Build and install (user scope)
 
 ```bash
-flatpak-builder --user --install --force-clean build-flatpak flatpak/io.github.nestorchurin.MineImator.yml
+flatpak-builder --user --install --force-clean build-flatpak flatpak/com.nestor_churin.MineImator.yml
 ```
 
 ### Run
 
 ```bash
-flatpak run io.github.nestorchurin.MineImator
+flatpak run com.nestor_churin.MineImator
 ```
 
 ### Build a distributable bundle
 
 ```bash
-flatpak build-bundle ~/.local/share/flatpak/repo MineImator.flatpak io.github.nestorchurin.MineImator
+flatpak build-bundle ~/.local/share/flatpak/repo MineImator.flatpak com.nestor_churin.MineImator
 ```
 
 For Flathub submission steps, see `FLATHUB_SUBMISSION.md`.

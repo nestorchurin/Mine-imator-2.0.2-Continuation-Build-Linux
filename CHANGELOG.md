@@ -4,12 +4,12 @@
 
 ### Added
 - Flatpak packaging files:
-  - `flatpak/io.github.nestorchurin.MineImator.yml`
-  - `flatpak/io.github.nestorchurin.MineImator.desktop`
-  - `flatpak/io.github.nestorchurin.MineImator.metainfo.xml`
+  - `flatpak/com.nestor_churin.MineImator.yml`
+  - `flatpak/com.nestor_churin.MineImator.desktop`
+  - `flatpak/com.nestor_churin.MineImator.metainfo.xml`
   - `flatpak/mine-imator.sh`
 - Root Flathub manifest:
-  - `io.github.nestorchurin.MineImator.yml`
+  - `com.nestor_churin.MineImator.yml`
 - Flathub submission helper files:
   - `flathub.json` (limit builds to `x86_64`)
   - `FLATHUB_SUBMISSION.md` (submission checklist and commands)

@@ -14,14 +14,14 @@ flatpak install -y flathub org.flatpak.Builder
 Build and install locally:
 
 ```bash
-flatpak-builder --user --install --force-clean build-flatpak flatpak/io.github.nestorchurin.MineImator.yml
-flatpak run io.github.nestorchurin.MineImator
+flatpak-builder --user --install --force-clean build-flatpak flatpak/com.nestor_churin.MineImator.yml
+flatpak run com.nestor_churin.MineImator
 ```
 
 Run Flathub linter:
 
 ```bash
-flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest io.github.nestorchurin.MineImator.yml
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.nestor_churin.MineImator.yml
 ```
 
 ## 2) Create submission PR
@@ -32,20 +32,20 @@ flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest io.githu
 ```bash
 git clone --branch=new-pr git@github.com:<your-github>/flathub.git
 cd flathub
-git checkout -b add-io-github-nestorchurin-mineimator new-pr
+git checkout -b add-com-nestor-churin-mineimator new-pr
 ```
 
 3. Copy these files into the Flathub repo root:
 
-- `io.github.nestorchurin.MineImator.yml` (copy from this repository root)
+- `com.nestor_churin.MineImator.yml` (copy from this repository root)
 - `flathub.json` (from this repository root)
 
 4. Commit and push:
 
 ```bash
-git add io.github.nestorchurin.MineImator.yml flathub.json
-git commit -m "Add io.github.nestorchurin.MineImator"
-git push -u origin add-io-github-nestorchurin-mineimator
+git add com.nestor_churin.MineImator.yml flathub.json
+git commit -m "Add com.nestor_churin.MineImator"
+git push -u origin add-com-nestor-churin-mineimator
 ```
 
 5. Open PR to `flathub/flathub` branch `new-pr`.

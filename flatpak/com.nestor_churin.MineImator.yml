@@ -1,4 +1,4 @@
-app-id: io.github.nestorchurin.MineImator
+app-id: com.nestor_churin.MineImator
 runtime: org.kde.Platform
 runtime-version: "5.15-25.08"
 sdk: org.kde.Sdk
@@ -10,7 +10,8 @@ finish-args:
   - --socket=wayland
   - --socket=pulseaudio
   - --device=dri
-  - --filesystem=home
+  - --filesystem=xdg-documents:rw
+  - --filesystem=xdg-download:rw
 
 modules:
   - name: mine-imator
@@ -20,10 +21,10 @@ modules:
       - cmake --build build --parallel
       - install -Dm755 build/Mine-imator /app/bin/Mine-imator
       - install -Dm755 flatpak/mine-imator.sh /app/bin/mine-imator
-      - install -Dm644 flatpak/io.github.nestorchurin.MineImator.desktop /app/share/applications/io.github.nestorchurin.MineImator.desktop
-      - install -Dm644 flatpak/io.github.nestorchurin.MineImator.metainfo.xml /app/share/metainfo/io.github.nestorchurin.MineImator.metainfo.xml
-      - install -Dm644 Installer/Linux/Mine-imator/usr/share/pixmaps/mine-imator.png /app/share/icons/hicolor/256x256/apps/io.github.nestorchurin.MineImator.png
-      - install -Dm644 Installer/Windows/license.txt /app/share/licenses/io.github.nestorchurin.MineImator/upstream/LICENSE
+      - install -Dm644 flatpak/com.nestor_churin.MineImator.desktop /app/share/applications/com.nestor_churin.MineImator.desktop
+      - install -Dm644 flatpak/com.nestor_churin.MineImator.metainfo.xml /app/share/metainfo/com.nestor_churin.MineImator.metainfo.xml
+      - install -Dm644 Installer/Linux/Mine-imator/usr/share/pixmaps/mine-imator.png /app/share/icons/hicolor/256x256/apps/com.nestor_churin.MineImator.png
+      - install -Dm644 Installer/Windows/license.txt /app/share/licenses/com.nestor_churin.MineImator/upstream/LICENSE
     sources:
       - type: dir
         path: ..

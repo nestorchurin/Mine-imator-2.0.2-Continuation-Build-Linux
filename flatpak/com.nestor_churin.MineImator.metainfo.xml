@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2026 Nestor Churin -->
 <component type="desktop-application">
-  <id>io.github.nestorchurin.MineImator</id>
+  <id>com.nestor_churin.MineImator</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>Mine-imator</name>
@@ -14,12 +14,12 @@
       Mine-imator is a 3D movie maker for creating Minecraft-style animations.
     </p>
   </description>
-  <launchable type="desktop-id">io.github.nestorchurin.MineImator.desktop</launchable>
+  <launchable type="desktop-id">com.nestor_churin.MineImator.desktop</launchable>
   <url type="homepage">https://www.mineimator.com</url>
   <url type="contact">https://nestor-churin.com</url>
   <url type="bugtracker">https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build/issues</url>
   <url type="vcs-browser">https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build</url>
-  <developer id="io.github.nestorchurin">
+  <developer id="com.nestor_churin">
     <name>Nestor Churin</name>
   </developer>
   <screenshots>
@@ -38,9 +38,11 @@
   <releases>
     <release version="1.0.13" date="2026-03-24"/>
   </releases>
-  <requires>
+  <recommends>
     <control>keyboard</control>
     <control>pointing</control>
+  </recommends>
+  <requires>
     <display_length compare="ge">768</display_length>
   </requires>
   <content_rating type="oars-1.1"/>
