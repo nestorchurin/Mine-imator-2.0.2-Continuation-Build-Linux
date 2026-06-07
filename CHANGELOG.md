@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-06-08
+
+### Added
+- **Native Linux build script** (`scripts/build-native.sh`):
+  - New script to build a host-native binary (without Flatpak sandbox).
+  - Checks and offers to install missing apt packages automatically.
+  - Supports `--install` (installs to `~/.local/bin/Mine-imator/` + desktop entry), `--clean`
+    (wipe build dir), `--codegen` (regenerate C++ from GML via dotnet CppGen).
+  - Uses `cmake -G Ninja -DUSE_SYSTEM_LIBS=ON` for system pkg-config libraries.
+- **GCC `-fpermissive` flag for generated code** (`CppProject/CMakeLists.txt`):
+  - The GML→C++ code generator produces `const`-qualifier violations that clang accepts but
+    g++ rejects. Added `-fpermissive` conditionally when `CMAKE_CXX_COMPILER_ID == "GNU"`.
+
 ## 2026-06-07
 
 ### Fixed

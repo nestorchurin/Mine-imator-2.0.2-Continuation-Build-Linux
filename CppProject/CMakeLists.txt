@@ -113,6 +113,10 @@ else()
 
 		message("Linux platform")
 		set(EXT_DIR "${CMAKE_SOURCE_DIR}/External/Linux")
+		# GCC is stricter than clang about const-qualifiers in generated code
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			add_compile_options("-fpermissive")
+		endif()
 		if (NOT USE_SYSTEM_LIBS)
 			set(LIBS ${LIBS} "-lvdpau -lva -lva-drm -lva-x11 -lsndio -lx264 -lgnutls -lnettle")
 		else()
