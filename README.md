@@ -21,6 +21,11 @@ This repository is a community-maintained Linux fork/packaging effort for Mine-i
 - Linux fork maintainer: Nestor Churin
 - Maintainer page: https://nestor-churin.com
 
+> **Vibe-coded with GitHub Copilot.**
+> The Linux porting work (Flatpak packaging, build system fixes, keyboard/mouse
+> fixes on Wayland/XWayland) was developed with AI-assisted vibe coding using
+> GitHub Copilot, since the maintainer is not familiar with GML (GameMaker Language).
+
 ## Flatpak build (Linux)
 
 This repository now includes a Flatpak manifest for Linux packaging:

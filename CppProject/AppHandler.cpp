@@ -14,6 +14,7 @@
 #include "Render/VertexBufferRenderer.hpp"
 
 #include <QDesktopWidget>
+#include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -54,6 +55,13 @@ namespace CppProject
 			handler = this;
 			new QApplication(argc, argv);
 			QCoreApplication::setApplicationName(PROJECT_NAME);
+
+#if !OS_MAC
+			// QCursor::setPos() is a no-op on the native Wayland platform.
+			// Disable mouse lock so camera dragging uses delta-tracking instead.
+			if (QGuiApplication::platformName() == "wayland")
+				AppWindow::mouseEnableLock = false;
+#endif
 
 			// Initialize string table
 			StringType::AddQThread(QThread::currentThread());
@@ -461,7 +469,10 @@ namespace CppProject
 				if (keyMap.contains(event->key())) // Mapped key
 					keys = { keyMap.value(event->key()) };
 				else
-					keys = { event->nativeVirtualKey() };
+					// Use Qt key value (uppercase ASCII for letters) instead of
+					// nativeVirtualKey() which returns lowercase X11 keysyms on Linux,
+					// causing a mismatch with GameMaker's ord()-based vk constants.
+					keys = { event->key() };
 				break;
 			}
 		}

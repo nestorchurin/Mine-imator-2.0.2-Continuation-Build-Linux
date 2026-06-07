@@ -56,10 +56,10 @@ namespace CppGen
 			string workingDir = Directory.GetCurrentDirectory();
 			string parentDir = new DirectoryInfo(workingDir).Parent.FullName;
 			string gmDir = parentDir;
-			string outputCodeDir = parentDir + @"\CppProject\Generated";
-			string outputSpritesDir = parentDir + @"\CppProject\Asset\Sprites";
-			string outputShadersDir = parentDir + @"\CppProject\Asset\Shaders";
-			string jsonFile = workingDir + @"\gml.json";
+			string outputCodeDir = Path.Combine(parentDir, "CppProject", "Generated");
+			string outputSpritesDir = Path.Combine(parentDir, "CppProject", "Asset", "Sprites");
+			string outputShadersDir = Path.Combine(parentDir, "CppProject", "Asset", "Shaders");
+			string jsonFile = Path.Combine(workingDir, "gml.json");
 			bool genGmlFunc = true;
 
 			if (args.Length == 5)
@@ -87,7 +87,7 @@ namespace CppGen
 			Strings.Add("");
 
 			// Parse sprites
-			string[] spriteDirs = Directory.GetDirectories(gmDir + @"\sprites");
+			string[] spriteDirs = Directory.GetDirectories(Path.Combine(gmDir, "sprites"));
 			foreach (string dir in spriteDirs)
 			{
 				Sprite spr = new Sprite(dir, outputSpritesDir);
@@ -100,9 +100,9 @@ namespace CppGen
 				Console.WriteLine("No sprites were updated");
 
 			// Parse shaders
-			if (Directory.Exists(gmDir + @"\shaders"))
+			if (Directory.Exists(Path.Combine(gmDir, "shaders")))
 			{
-				string[] shaderDirs = Directory.GetDirectories(gmDir + @"\shaders");
+				string[] shaderDirs = Directory.GetDirectories(Path.Combine(gmDir, "shaders"));
 				foreach (string dir in shaderDirs)
 				{
 					Shader shader = new Shader(dir, outputShadersDir);
@@ -116,15 +116,7 @@ namespace CppGen
 				Console.WriteLine("The following shaders were modified in the C++ project:");
 				foreach (Shader.FileModification mod in Shader.Modifications)
 					Console.WriteLine("    " + mod.Source);
-
-				Console.WriteLine("Do you want to copy them over to the GameMaker project? (y/n)");
-				string input = Console.ReadLine();
-				if (input.ToLower().StartsWith("y"))
-				{
-					foreach (Shader.FileModification mod in Shader.Modifications)
-						File.Copy(mod.Source, mod.Dest, true);
-					Shader.TotalCopied += Shader.Modifications.Count;
-				}
+				Console.WriteLine("Skipping copy-back in non-interactive mode.");
 			}
 
 			if (Shader.TotalCopied > 0)
@@ -136,11 +128,11 @@ namespace CppGen
 			timer.Start();
 
 			// Parse script GML
-			string[] scriptDirs = Directory.GetDirectories(gmDir + @"\scripts");
+			string[] scriptDirs = Directory.GetDirectories(Path.Combine(gmDir, "scripts"));
 			foreach (string dir in scriptDirs)
 			{
 				DirectoryInfo dirInfo = new DirectoryInfo(dir);
-				FileInfo gmlInfo = new FileInfo(dir + "\\" + dirInfo.Name + ".gml");
+				FileInfo gmlInfo = new FileInfo(Path.Combine(dir, dirInfo.Name + ".gml"));
 				if (!gmlInfo.Exists)
 					continue;
 
@@ -151,7 +143,7 @@ namespace CppGen
 			Console.WriteLine("Parsed GML ({0} lines) in {1}ms", GML.TotalLines, (int)timer.Elapsed.TotalMilliseconds);
 
 			// Parse objects
-			string[] objectDirs = Directory.GetDirectories(gmDir + @"\objects");
+			string[] objectDirs = Directory.GetDirectories(Path.Combine(gmDir, "objects"));
 			foreach (string dir in objectDirs)
 			{
 				Object obj = new Object(dir);
@@ -225,7 +217,7 @@ namespace CppGen
 
 			// Generate GmlFunc.hpp
 			if (genGmlFunc)
-				GML.ExportHeader(outputCodeDir + @"\GmlFunc.hpp");
+				GML.ExportHeader(Path.Combine(outputCodeDir, "GmlFunc.hpp"));
 
 			// Generate Scripts.hpp
 			CodeWriter.Begin();
@@ -323,7 +315,7 @@ namespace CppGen
 			CodeWriter.WriteLine();
 
 			CodeWriter.WriteLine("}", -1);
-			CodeWriter.End(outputCodeDir + @"\Scripts.hpp");
+			CodeWriter.End(Path.Combine(outputCodeDir, "Scripts.hpp"));
 
 			// Declare Globals.cpp
 			CodeWriter.Begin();
@@ -347,7 +339,7 @@ namespace CppGen
 			CodeWriter.WriteLine();
 
 			CodeWriter.WriteLine("}", -1);
-			CodeWriter.End(outputCodeDir + @"\Globals.cpp");
+			CodeWriter.End(Path.Combine(outputCodeDir, "Globals.cpp"));
 
 			// Generate Scripts1...n.cpp
 			const int maxLinePerFile = 1000;
@@ -387,14 +379,14 @@ namespace CppGen
 				}
 
 				CodeWriter.WriteLine("}", -1);
-				CodeWriter.End(outputCodeDir + @"\Scripts" + f + ".cpp");
+				CodeWriter.End(Path.Combine(outputCodeDir, "Scripts" + f + ".cpp"));
 				f++;
 			}
 
 			// Delete unused
 			while (true)
 			{
-				FileInfo file = new FileInfo(outputCodeDir + @"\Scripts" + f + ".cpp");
+				FileInfo file = new FileInfo(Path.Combine(outputCodeDir, "Scripts" + f + ".cpp"));
 				if (file.Exists)
 					file.Delete();
 				else
@@ -459,7 +451,7 @@ namespace CppGen
 			CodeWriter.WriteLine("}", -1);
 
 			CodeWriter.WriteLine("}", -1);
-			CodeWriter.End(outputCodeDir + @"\Mappings.cpp");
+			CodeWriter.End(Path.Combine(outputCodeDir, "Mappings.cpp"));
 
 			// Finished
 			Console.WriteLine("Generated code ({0} lines) in {1}ms", CodeWriter.TotalLines, (int)timer.Elapsed.TotalMilliseconds);
@@ -474,7 +466,6 @@ namespace CppGen
 			}
 			else
 				Console.WriteLine("Success!");
-			Console.ReadKey();
 		}
 
 		public static void ResolveProject()
@@ -763,13 +754,13 @@ namespace CppGen
 			foreach (string obj in objsStrings)
 				objsText += obj + "\n";
 
-			string logDir = Directory.GetCurrentDirectory() + @"\Logs";
+			string logDir = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
 			Directory.CreateDirectory(logDir);
 			Console.WriteLine("Writing logs to {0}", logDir);
-			File.WriteAllText(logDir + @"\globalVars.log", globalVarsText);
-			File.WriteAllText(logDir + @"\unknownVars.log", unknownVarsText);
-			File.WriteAllText(logDir + @"\funcs.log", funcsText);
-			File.WriteAllText(logDir + @"\objs.log", objsText);
+			File.WriteAllText(Path.Combine(logDir, "globalVars.log"), globalVarsText);
+			File.WriteAllText(Path.Combine(logDir, "unknownVars.log"), unknownVarsText);
+			File.WriteAllText(Path.Combine(logDir, "funcs.log"), funcsText);
+			File.WriteAllText(Path.Combine(logDir, "objs.log"), objsText);
 		}
 	}
 }

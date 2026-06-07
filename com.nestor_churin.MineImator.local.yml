@@ -45,6 +45,13 @@ modules:
       - install -Dm644 Installer/Linux/Mine-imator/usr/share/pixmaps/mine-imator.png /app/share/icons/hicolor/256x256/apps/com.nestor_churin.MineImator.png
       - install -Dm644 Installer/Windows/license.txt /app/share/licenses/com.nestor_churin.MineImator/upstream/LICENSE
     sources:
-      - type: git
-        url: https://github.com/nestorchurin/Mine-imator-2.0.2-Continuation-Build.git
-        commit: 41cb3acaec0f8ca56b72ff1215a306f3dead4c22
+      - type: dir
+        path: .
+        skip:
+          - .git
+          - .flatpak-builder
+          - build-flatpak
+          - build-host
+          - repo
+          - Logs
+          - .vscode

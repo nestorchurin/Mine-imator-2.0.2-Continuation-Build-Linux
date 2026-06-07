@@ -14,11 +14,30 @@ finish-args:
   - --filesystem=xdg-download:rw
 
 modules:
+  - name: libzip
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      - -DBUILD_DOC=OFF
+      - -DBUILD_EXAMPLES=OFF
+      - -DBUILD_REGRESS=OFF
+      - -DBUILD_TOOLS=OFF
+      - -DENABLE_COMMONCRYPTO=OFF
+      - -DENABLE_GNUTLS=OFF
+      - -DENABLE_MBEDTLS=OFF
+      - -DENABLE_OPENSSL=OFF
+    sources:
+      - type: archive
+        url: https://libzip.org/download/libzip-1.9.2.tar.gz
+        sha256: fd6a7f745de3d69cf5603edc9cb33d2890f0198e415255d0987a0cf10d824c6f
+
   - name: mine-imator
     buildsystem: simple
     build-commands:
       - cmake -S CppProject -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DUSE_SYSTEM_LIBS=ON
       - cmake --build build --parallel
+      - mkdir -p /app/bin
+      - cp -a GmProject/datafiles/. /app/bin/
       - install -Dm755 build/Mine-imator /app/bin/Mine-imator
       - install -Dm755 flatpak/mine-imator.sh /app/bin/mine-imator
       - install -Dm644 flatpak/com.nestor_churin.MineImator.desktop /app/share/applications/com.nestor_churin.MineImator.desktop

@@ -7,6 +7,7 @@
 extern "C"
 {
 	#include <libavutil/opt.h>
+	#include <libavutil/channel_layout.h>
 	#include <libavutil/mathematics.h>
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
@@ -121,13 +122,21 @@ namespace CppProject
 			if (!swrContext)
 				throw "swr_alloc failed";
 
+			#if LIBAVUTIL_VERSION_MAJOR >= 57
+			AVChannelLayout outChLayout;
+			av_channel_layout_default(&outChLayout, STREAM_AUDIO_CHANNELS);
+			av_opt_set_chlayout(swrContext, "in_chlayout", &codecContext->ch_layout, 0);
+			av_opt_set_chlayout(swrContext, "out_chlayout", &outChLayout, 0);
+			av_channel_layout_uninit(&outChLayout);
+			#else
 			av_opt_set_int(swrContext, "in_channel_count", codecContext->channels, 0);
 			av_opt_set_int(swrContext, "in_channel_layout", codecContext->channel_layout, 0);
+			av_opt_set_int(swrContext, "out_channel_layout", STREAM_AUDIO_CHANNEL_LAYOUT, 0);
+			#endif
 			av_opt_set_int(swrContext, "in_sample_rate", codecContext->sample_rate, 0);
 			av_opt_set_sample_fmt(swrContext, "in_sample_fmt", codecContext->sample_fmt, 0);
 
 			av_opt_set_int(swrContext, "out_channel_count", STREAM_AUDIO_CHANNELS, 0);
-			av_opt_set_int(swrContext, "out_channel_layout", STREAM_AUDIO_CHANNEL_LAYOUT, 0);
 			av_opt_set_int(swrContext, "out_sample_rate", STREAM_AUDIO_SAMPLE_RATE, 0);
 			av_opt_set_sample_fmt(swrContext, "out_sample_fmt", STREAM_AUDIO_SAMPLE_FORMAT, 0);
 
@@ -328,8 +337,12 @@ namespace CppProject
 				audioCodecContext->sample_fmt = STREAM_AUDIO_SAMPLE_FORMAT_MOVIE;
 				audioCodecContext->sample_rate = STREAM_AUDIO_SAMPLE_RATE;
 				audioCodecContext->bit_rate = STREAM_AUDIO_BIT_RATE;
+				#if LIBAVUTIL_VERSION_MAJOR >= 57
+				av_channel_layout_default(&audioCodecContext->ch_layout, STREAM_AUDIO_CHANNELS);
+				#else
 				audioCodecContext->channels = STREAM_AUDIO_CHANNELS;
 				audioCodecContext->channel_layout = STREAM_AUDIO_CHANNEL_LAYOUT;
+				#endif
 				if (outContext->oformat->flags & AVFMT_GLOBALHEADER)
 					audioCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
@@ -462,8 +475,13 @@ namespace CppProject
 
 				audioFrame->nb_samples = audioCodecContext->frame_size;
 				audioFrame->format = STREAM_AUDIO_SAMPLE_FORMAT_MOVIE;
+				#if LIBAVUTIL_VERSION_MAJOR >= 57
+				if (av_channel_layout_copy(&audioFrame->ch_layout, &audioCodecContext->ch_layout) < 0)
+					throw "av_channel_layout_copy failed";
+				#else
 				audioFrame->channel_layout = STREAM_AUDIO_CHANNEL_LAYOUT;
 				audioFrame->channels = STREAM_AUDIO_CHANNELS;
+				#endif
 				audioFrame->sample_rate = STREAM_AUDIO_SAMPLE_RATE;
 
 				if (av_frame_get_buffer(audioFrame, 0) < 0)

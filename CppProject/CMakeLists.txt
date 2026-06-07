@@ -117,6 +117,8 @@ else()
 			set(LIBS ${LIBS} "-lvdpau -lva -lva-drm -lva-x11 -lsndio -lx264 -lgnutls -lnettle")
 		else()
 			find_package(PkgConfig REQUIRED)
+			pkg_check_modules(PC_ZLIB REQUIRED IMPORTED_TARGET zlib)
+			pkg_check_modules(PC_FREETYPE2 REQUIRED IMPORTED_TARGET freetype2)
 			pkg_check_modules(PC_OPENAL REQUIRED IMPORTED_TARGET openal)
 			pkg_check_modules(PC_LIBZIP REQUIRED IMPORTED_TARGET libzip)
 			pkg_check_modules(PC_AVFORMAT REQUIRED IMPORTED_TARGET libavformat)
@@ -125,6 +127,8 @@ else()
 			pkg_check_modules(PC_SWRESAMPLE REQUIRED IMPORTED_TARGET libswresample)
 			pkg_check_modules(PC_SWSCALE REQUIRED IMPORTED_TARGET libswscale)
 			set(LIBS ${LIBS}
+				PkgConfig::PC_ZLIB
+				PkgConfig::PC_FREETYPE2
 				PkgConfig::PC_OPENAL
 				PkgConfig::PC_LIBZIP
 				PkgConfig::PC_AVFORMAT
