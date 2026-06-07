@@ -1,4 +1,5 @@
 # Changelog
+
 ## 2026-06-07
 
 ### Fixed
@@ -11,36 +12,15 @@
     keyboard layout is active, breaking all letter shortcuts. Added a `scanCodeMap` that maps
     physical X11 scan codes (fixed for standard PC keyboards) to uppercase ASCII, bypassing layout
     entirely. Used as priority lookup before `event->key()` fallback.
-- **Mouse drag/wrap broken on Wayland** (`CppProject/AppHandler.cpp`):
-  - `QCursor::setPos()` is a silent no-op on the native Wayland platform, making camera drag and
-    mouse wrap non-functional. Added a runtime check: if `QGuiApplication::platformName() == "wayland"`,
-    `AppWindow::mouseEnableLock` is set to `false` at startup so the delta-tracking code path
-    (which does not rely on cursor warping) is used instead.
+- **Mouse camera control broken on native Wayland** (`CppProject/AppHandler.cpp`):
+  - `QCursor::setPos()` is a no-op on the native Wayland platform. Added runtime detection:
+    if `QGuiApplication::platformName() == "wayland"`, `AppWindow::mouseEnableLock` is set to
+    `false`, enabling delta-tracking (no physical cursor warp). XWayland path unaffected.
 - **Cursor hitting viewport edge during rotation/pan** (`CppProject/World/Preview.cpp`):
   - During ROTATE and PAN modes in the world importer viewport, the mouse cursor would hit the
     screen edge and stop registering movement. Added Blender-style edge wrap: when the cursor
     reaches within 4px of the viewport edge, it teleports to the opposite side so rotation/pan
     is unlimited.
-## 2026-06-07
-
-### Fixed
-- **Keyboard shortcuts broken on Linux** (`CppProject/AppHandler.cpp`):
-  - `SetKeyDown` previously used `event->nativeVirtualKey()` as the key code fallback for unmapped keys.
-    On Linux/X11 this returns the X11 keysym (`XK_a = 97`, `XK_z = 122`, etc.), which does not match
-    GameMaker's `ord()`-based VK constants (`ord('A') = 65`, `ord('Z') = 90`).
-  - Changed to `event->key()` which returns Qt key enum values — for letter/digit keys these equal
-    the uppercase ASCII code, matching GameMaker's VK system exactly.
-  - Previously all letter-based shortcuts (Ctrl+Z, Ctrl+S, W/A/S/D navigation, etc.) were silently
-    ignored unless Shift was also held.
-- **Mouse camera control broken on native Wayland** (`CppProject/AppHandler.cpp`):
-  - `QCursor::setPos()` is a no-op on the native Wayland platform; the app uses this for
-    mouse-lock/wrap during camera drag (`app_mouse_wrap` → `window_mouse_set` → `display_mouse_set`).
-  - Added runtime detection after `QApplication` init: if `QGuiApplication::platformName() == "wayland"`,
-    `AppWindow::mouseEnableLock` is set to `false`, enabling the same delta-tracking approach
-    used on macOS (no physical cursor warp; virtual mouse position accumulates movement deltas).
-  - Added `#include <QGuiApplication>` to `AppHandler.cpp` for the platform name query.
-  - Note: when the Flatpak runs under XWayland (`QT_QPA_PLATFORM=xcb`), `mouseEnableLock`
-    stays `true` and physical cursor warping continues to work as intended.
 
 ## 2026-06-02
 
