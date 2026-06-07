@@ -176,6 +176,11 @@ if [[ "$DO_INSTALL" == "true" ]]; then
     LAUNCHER="$HOME/.local/bin/mine-imator"
     cat > "$LAUNCHER" <<'SCRIPT'
 #!/usr/bin/env bash
+# Force XWayland (xcb) so QCursor::setPos() works for camera drag.
+# On native Wayland, Qt's setPos() is a no-op which breaks the camera.
+if [[ -n "$WAYLAND_DISPLAY" && -n "$DISPLAY" ]]; then
+    export QT_QPA_PLATFORM=xcb
+fi
 cd "$(dirname "$(readlink -f "$0")")/Mine-imator"
 exec ./Mine-imator "$@"
 SCRIPT
