@@ -136,6 +136,29 @@ namespace CppProject
 			cursorMap[cr_size_all] = Qt::SizeAllCursor;
 			cursorMap[cr_handpoint] = Qt::PointingHandCursor;
 
+			// Map X11 scan codes to uppercase ASCII (layout-independent, e.g. works with Cyrillic layout).
+			// X11 keycode = evdev keycode + 8. These positions are fixed for standard PC keyboards.
+			{ // digits row
+				const int d[] = {10,11,12,13,14,15,16,17,18,19};
+				const char c[] = {'1','2','3','4','5','6','7','8','9','0'};
+				for (int i = 0; i < 10; i++) scanCodeMap[d[i]] = c[i];
+			}
+			{ // top row Q..P
+				const int d[] = {24,25,26,27,28,29,30,31,32,33};
+				const char c[] = {'Q','W','E','R','T','Y','U','I','O','P'};
+				for (int i = 0; i < 10; i++) scanCodeMap[d[i]] = c[i];
+			}
+			{ // home row A..L
+				const int d[] = {38,39,40,41,42,43,44,45,46};
+				const char c[] = {'A','S','D','F','G','H','J','K','L'};
+				for (int i = 0; i < 9; i++) scanCodeMap[d[i]] = c[i];
+			}
+			{ // bottom row Z..M
+				const int d[] = {52,53,54,55,56,57,58};
+				const char c[] = {'Z','X','C','V','B','N','M'};
+				for (int i = 0; i < 7; i++) scanCodeMap[d[i]] = c[i];
+			}
+
 			// Map Qt/GML key codes
 			keyMap[Qt::Key_Alt] = vk_alt;
 			keyMap[Qt::Key_Control] = vk_control;
@@ -466,12 +489,12 @@ namespace CppProject
 			case Qt::Key_Shift: keys = { vk_shift, vk_rshift, vk_lshift }; break;
 			default:
 			{
-				if (keyMap.contains(event->key())) // Mapped key
+				if (keyMap.contains(event->key())) // Mapped special key
 					keys = { keyMap.value(event->key()) };
+				else if (scanCodeMap.contains(event->nativeScanCode())) // Layout-independent physical key (fixes Cyrillic/non-Latin layouts)
+					keys = { scanCodeMap.value(event->nativeScanCode()) };
 				else
-					// Use Qt key value (uppercase ASCII for letters) instead of
-					// nativeVirtualKey() which returns lowercase X11 keysyms on Linux,
-					// causing a mismatch with GameMaker's ord()-based vk constants.
+					// Fallback: Qt key value (uppercase ASCII for Latin letters)
 					keys = { event->key() };
 				break;
 			}

@@ -6,11 +6,21 @@
   - `SetKeyDown()` was passing `event->nativeVirtualKey()` as the GML key code, which returns
     lowercase X11 keysyms (e.g. `97` for 'a') — mismatching GML's `ord('A')=65`-based keybind
     constants. Changed to use `event->key()` which returns uppercase Qt key values matching GML.
+- **Keyboard shortcuts broken with non-Latin layouts (Cyrillic, etc.)** (`CppProject/AppHandler.cpp`):
+  - `event->key()` returns the layout-specific character (e.g. a Cyrillic code) when a non-Latin
+    keyboard layout is active, breaking all letter shortcuts. Added a `scanCodeMap` that maps
+    physical X11 scan codes (fixed for standard PC keyboards) to uppercase ASCII, bypassing layout
+    entirely. Used as priority lookup before `event->key()` fallback.
 - **Mouse drag/wrap broken on Wayland** (`CppProject/AppHandler.cpp`):
   - `QCursor::setPos()` is a silent no-op on the native Wayland platform, making camera drag and
     mouse wrap non-functional. Added a runtime check: if `QGuiApplication::platformName() == "wayland"`,
     `AppWindow::mouseEnableLock` is set to `false` at startup so the delta-tracking code path
     (which does not rely on cursor warping) is used instead.
+- **Cursor hitting viewport edge during rotation/pan** (`CppProject/World/Preview.cpp`):
+  - During ROTATE and PAN modes in the world importer viewport, the mouse cursor would hit the
+    screen edge and stop registering movement. Added Blender-style edge wrap: when the cursor
+    reaches within 4px of the viewport edge, it teleports to the opposite side so rotation/pan
+    is unlimited.
 ## 2026-06-07
 
 ### Fixed

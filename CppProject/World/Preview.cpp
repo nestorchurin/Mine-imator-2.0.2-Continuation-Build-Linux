@@ -525,6 +525,22 @@ namespace CppProject
 						camAngleZ = std::clamp(camAngleZ, -89.9, 89.9);
 						UpdateCameraPosition();
 
+						// Blender-style wrap: teleport cursor to opposite viewport edge so rotation is unlimited
+						{
+							const int margin = 4;
+							IntType nx = gmlGlobal::mouse_x, ny = gmlGlobal::mouse_y;
+							if (nx < rect.left() + margin)        nx = rect.right() - margin;
+							else if (nx > rect.right() - margin)  nx = rect.left() + margin;
+							if (ny < rect.top() + margin)         ny = rect.bottom() - margin;
+							else if (ny > rect.bottom() - margin) ny = rect.top() + margin;
+							if (nx != gmlGlobal::mouse_x || ny != gmlGlobal::mouse_y)
+							{
+								window_mouse_set(nx, ny);
+								mouseLastX = nx;
+								mouseLastY = ny;
+							}
+						}
+
 						global::_app->mouse_cursor = cr_size_all;
 						break;
 					}
@@ -537,6 +553,22 @@ namespace CppProject
 						VecType moveVec = right * deltaX - up * deltaY;
 						camPos += moveVec;
 						camTarget += moveVec;
+
+						// Blender-style wrap for pan mode
+						{
+							const int margin = 4;
+							IntType nx = gmlGlobal::mouse_x, ny = gmlGlobal::mouse_y;
+							if (nx < rect.left() + margin)        nx = rect.right() - margin;
+							else if (nx > rect.right() - margin)  nx = rect.left() + margin;
+							if (ny < rect.top() + margin)         ny = rect.bottom() - margin;
+							else if (ny > rect.bottom() - margin) ny = rect.top() + margin;
+							if (nx != gmlGlobal::mouse_x || ny != gmlGlobal::mouse_y)
+							{
+								window_mouse_set(nx, ny);
+								mouseLastX = nx;
+								mouseLastY = ny;
+							}
+						}
 
 						global::_app->mouse_cursor = cr_size_all;
 						break;
