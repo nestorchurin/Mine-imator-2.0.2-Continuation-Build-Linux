@@ -143,6 +143,8 @@ cmake -S "$REPO_ROOT/CppProject" -B "$BUILD_DIR" \
     -DCMAKE_BUILD_TYPE=Release \
     -DUSE_SYSTEM_LIBS=ON \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_C_COMPILER="$(command -v clang || command -v gcc)" \
+    -DCMAKE_CXX_COMPILER="$(command -v clang++ || command -v g++)" \
     2>&1 | tee -a "$LOG"
 
 success "Configure done"
